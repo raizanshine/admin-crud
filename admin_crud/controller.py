@@ -10,6 +10,7 @@ class AdminController(object):
             'list': self.list,
             'detail': self.detail,
             'create': self.create,
+            'update': self.update,
         }
 
     def get_template_names(self, action):
@@ -17,6 +18,7 @@ class AdminController(object):
             'list': 'admin_crud/list.html',
             'detail': 'admin_crud/detail.html',
             'create': 'admin_crud/create.html',
+            'update': 'admin_crud/update.html',
         }
 
         return template_names[action]
@@ -40,6 +42,11 @@ class AdminController(object):
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
+    def update(self, request, *args, **kwargs):
+        template = self.get_template_names('update')
+        context = self.get_context_data()
+        return TemplateResponse(request, template, context)
+
     def get_urls(self, **kwargs):
         """
         Generate urls for any available actions
@@ -47,5 +54,6 @@ class AdminController(object):
         return [
             url(r'^$', self.list),
             url(r'^create/$', self.create),
-            url(r'^(?<pk>\d+)/$', self.detail),
+            url(r'^(?P<pk>\d+)/$', self.detail),
+            url(r'^(?P<pk>\d+)/update/$', self.update),
         ]
