@@ -3,6 +3,8 @@ from django.template.response import TemplateResponse
 
 
 class AdminController(object):
+    model = None
+
     def get_actions(self):
         return {
             'list': self.list,
