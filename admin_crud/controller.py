@@ -9,12 +9,14 @@ class AdminController(object):
         return {
             'list': self.list,
             'detail': self.detail,
+            'create': self.create,
         }
 
     def get_template_names(self, action):
         template_names = {
             'list': 'admin_crud/list.html',
             'detail': 'admin_crud/detail.html',
+            'create': 'admin_crud/create.html',
         }
 
         return template_names[action]
@@ -28,8 +30,13 @@ class AdminController(object):
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
+    def create(self, request, *args, **kwargs):
+        template = self.get_template_names('create')
+        context = self.get_context_data()
+        return TemplateResponse(request, template, context)
+
     def detail(self, request, *args, **kwargs):
-        template = self.get_template_names('list')
+        template = self.get_template_names('detail')
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
@@ -39,5 +46,6 @@ class AdminController(object):
         """
         return [
             url(r'^$', self.list),
+            url(r'^create/$', self.create),
             url(r'^(?<pk>\d+)/$', self.detail),
         ]
