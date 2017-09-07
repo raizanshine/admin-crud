@@ -10,7 +10,7 @@ class AdminController(object):
 
     def get_template_name(self, action):
         template_names = {
-            'detail': 'admin_crud/detail.html'
+            'list': 'admin_crud/list.html'
         }
 
         return template_names[action]
@@ -20,14 +20,14 @@ class AdminController(object):
         return data
     
     def list(self, request, *args, **kwargs):
-        template = self.get_template_name('detail')
+        template = self.get_template_name('list')
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
-    @classmethod
-    def get_urls(cls, **kwargs):
+    def get_urls(self, **kwargs):
         """
         Generate urls for any available actions
         """
         return [
+            url(r'^$', self.list)
         ]
