@@ -11,6 +11,7 @@ class AdminController(object):
             'detail': self.detail,
             'create': self.create,
             'update': self.update,
+            'delete': self.delete,
         }
 
     def get_template_names(self, action):
@@ -19,6 +20,7 @@ class AdminController(object):
             'detail': 'admin_crud/detail.html',
             'create': 'admin_crud/create.html',
             'update': 'admin_crud/update.html',
+            'delete': 'admin_crud/delete.html',
         }
 
         return template_names[action]
@@ -47,6 +49,11 @@ class AdminController(object):
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
+    def delete(self, request, *args, **kwargs):
+        template = self.get_template_names('delete')
+        context = self.get_context_data()
+        return TemplateResponse(request, template, context)
+
     def get_urls(self, **kwargs):
         """
         Generate urls for any available actions
@@ -56,4 +63,5 @@ class AdminController(object):
             url(r'^create/$', self.create),
             url(r'^(?P<pk>\d+)/$', self.detail),
             url(r'^(?P<pk>\d+)/update/$', self.update),
+            url(r'^(?P<pk>\d+)/delete/$', self.delete),
         ]
