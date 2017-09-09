@@ -27,8 +27,14 @@
     </div>
     <!-- END Header -->
     <!-- Content -->
-    {% block content %}
-    {% endblock %}
+    <div class="breadcrumbs">
+        {% block breadcrumbs %}
+        {% endblock %}
+    </div>
+    <div id="content" class="flex">
+        {% block content %}
+        {% endblock %}
+    </div>
     <!-- END Content -->
     <div id="footer"></div>
 </div>

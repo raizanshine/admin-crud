@@ -1,1 +1,32 @@
 {% extends "admin_crud/base.html" %}
+
+{% block breadcrumbs %}
+    {% for title, link in breadcrumbs %}
+        {% if not forloop.first %}›{% endif %}
+        {% if link %}
+            <a href="{{ link }}">{{ title }}</a>
+        {% else %}
+            {{ title }}
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <h1>Select note to change</h1>
+    <div id="content-main">
+        <ul class="object-tools">
+            <li>
+                <a href="#" class="addlink">
+                    Add note
+                </a>
+            </li>
+        </ul>
+        <div class="module" id="changelist">
+            <p class="paginator">
+                0 notes
+            </p>
+        </div>
+    </div>
+<br class="clear">
+
+{% endblock %}

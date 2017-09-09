@@ -27,8 +27,8 @@ class AdminController(object):
         return template_names[action]
 
     def get_context_data(self):
-        data = {}
-        return data
+        breadcrumbs = [('Home', '/'), (self.model.__name__, None)]
+        return {'breadcrumbs': breadcrumbs}
 
     def get_object(self, pk):
         queryset = self.get_queryset()
