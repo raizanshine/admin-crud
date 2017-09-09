@@ -13,20 +13,21 @@ class Router(object):
 
     def build_groups(self, request):
         apps = self.registry
-        models = {}
+        groups = {}
 
         for path, controller in apps:
             app_label = controller.model._meta.app_label
-            if app_label not in models:
-                models[app_label] = {
+            if app_label not in groups:
+                groups[app_label] = {
                     'verbose_name': dj_apps.get_app_config(app_label).verbose_name,
                     'admins': []
                 }
             controller_info = {
                 'verbose_name': capfirst(controller.model._meta.verbose_name_plural),
             }
-            models[app_label]['admins'].append(controller_info)
-        return models
+            groups[app_label]['admins'].append(controller_info)
+
+        return groups
 
     def index_view(self, request, *args, **kwargs):
         groups = self.build_groups(request)
