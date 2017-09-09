@@ -1,0 +1,33 @@
+{% extends 'admin_crud/base.html' %}
+
+{% block content %}
+    <div id="content" class="colMS">
+        <h1>Site administration</h1>
+        {% for app_label, group in groups.items %}
+            <div id="content-main">
+                <div class="module">
+                    <table>
+                        <caption>
+                            <a href="#" class="section" title="{{ group.verbose_name }}">{{ group.verbose_name }}</a>
+                        </caption>
+                        {% for admin in group.admins %}
+                            <tr>
+                                <th scope="row"><a href="#">{{ admin.verbose_name }}</a></th>
+                                <td><a href="#" class="addlink">Add</a></td>
+                                <td><a href="#" class="changelink">Change</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+        <div id="content-related">
+            <div class="module" id="recent-actions-module">
+                <h2>Recent actions</h2>
+                <h3>My actions</h3>
+                <p>None available</p>
+            </div>
+        </div>
+        <br class="clear"/>
+    </div>
+{% endblock %}

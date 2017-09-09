@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
 
@@ -28,6 +29,14 @@ class AdminController(object):
     def get_context_data(self):
         data = {}
         return data
+
+    def get_object(self, pk):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, pk=pk)
+        return obj
+
+    def get_queryset(self):
+        return self.model.objects.all()
     
     def list(self, request, *args, **kwargs):
         template = self.get_template_names('list')

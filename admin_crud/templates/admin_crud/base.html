@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en-us" >
+<head>
+    <title>Site administration | Django site admin</title>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/dashboard.css" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
+</head>
+
+<body class=" dashboard" data-admin-utc-offset="0">
+<!-- Container -->
+<div id="container">
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+            <h1 id="site-name"><a href="#">Django administration</a></h1>
+        </div>
+
+        <div id="user-tools">
+            Welcome,
+            <strong>admin</strong>.
+            <a href="/">View site</a> /
+            <a href="#">Change password</a> /
+            <a href="#">Log out</a>
+        </div>
+    </div>
+    <!-- END Header -->
+    <!-- Content -->
+    {% block content %}
+    {% endblock %}
+    <!-- END Content -->
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+</body>
+</html>
