@@ -67,10 +67,12 @@ class AdminController(object):
         """
         Generate urls for any available actions
         """
+        model_name = self.model.__name__.lower()
+
         return [
-            url(r'^$', self.list),
-            url(r'^create/$', self.create),
-            url(r'^(?P<pk>\d+)/$', self.detail),
-            url(r'^(?P<pk>\d+)/update/$', self.update),
-            url(r'^(?P<pk>\d+)/delete/$', self.delete),
+            url(r'^$', self.list, name='%s-list' % model_name),
+            url(r'^create/$', self.create, name='%s-create' % model_name),
+            url(r'^(?P<pk>\d+)/$', self.detail, name='%s-detail' % model_name),
+            url(r'^(?P<pk>\d+)/update/$', self.update, name='%s-update' % model_name),
+            url(r'^(?P<pk>\d+)/delete/$', self.delete, name='%s-delete' % model_name),
         ]

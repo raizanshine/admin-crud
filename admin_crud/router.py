@@ -1,6 +1,7 @@
 from django.apps import apps as dj_apps
 from django.conf.urls import include, url
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.text import capfirst
 
 
@@ -24,6 +25,7 @@ class Router(object):
                 }
             controller_info = {
                 'verbose_name': capfirst(controller.model._meta.verbose_name_plural),
+                'admin_list_url': reverse('admin-crud:%s-list' % controller.model.__name__.lower()),
             }
             groups[app_label]['admins'].append(controller_info)
 
@@ -31,6 +33,7 @@ class Router(object):
 
     def index_view(self, request, *args, **kwargs):
         groups = self.build_groups(request)
+
         return TemplateResponse(
             request,
             template='admin_crud/index.html',
