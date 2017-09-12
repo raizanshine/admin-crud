@@ -1,10 +1,13 @@
 from django.conf.urls import url
+from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
 
 class AdminController(object):
     model = None
+    form_class = None
+    fields = '__all__'
 
     def get_actions(self):
         return {
@@ -35,6 +38,14 @@ class AdminController(object):
         obj = get_object_or_404(queryset, pk=pk)
         return obj
 
+    def get_form(self):
+        if not self.form_class:
+            form_class = modelform_factory(self.model, fields=self.fields)
+        else:
+            form_class = self.form_class
+
+        return form_class()
+
     def get_queryset(self):
         return self.model.objects.all()
     
@@ -46,6 +57,7 @@ class AdminController(object):
     def create(self, request, *args, **kwargs):
         template = self.get_template_names('create')
         context = self.get_context_data()
+        context['form'] = self.get_form()
         return TemplateResponse(request, template, context)
 
     def detail(self, request, *args, **kwargs):
