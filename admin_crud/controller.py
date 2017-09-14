@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.forms.models import modelform_factory
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
@@ -38,13 +39,21 @@ class AdminController(object):
         obj = get_object_or_404(queryset, pk=pk)
         return obj
 
-    def get_form(self):
+    def get_form(self, request):
         if not self.form_class:
             form_class = modelform_factory(self.model, fields=self.fields)
         else:
             form_class = self.form_class
 
-        return form_class()
+        kwargs = {}
+
+        if request.method == 'POST':
+            kwargs.update({
+                'data': request.POST,
+                'files': request.FILES,
+            })
+
+        return form_class(**kwargs)
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -57,7 +66,12 @@ class AdminController(object):
     def create(self, request, *args, **kwargs):
         template = self.get_template_names('create')
         context = self.get_context_data()
-        context['form'] = self.get_form()
+        form = self.get_form(request)
+        if request.method == 'POST':
+            if form.is_valid():
+                obj = form.save()
+                return HttpResponseRedirect('/')
+        context['form'] = form
         return TemplateResponse(request, template, context)
 
     def detail(self, request, *args, **kwargs):
