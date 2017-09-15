@@ -60,7 +60,9 @@ class AdminController(object):
     
     def list(self, request, *args, **kwargs):
         template = self.get_template_names('list')
-        context = self.get_context_data()
+        context = {
+            'object_list': self.get_queryset()
+        }
         return TemplateResponse(request, template, context)
 
     def create(self, request, *args, **kwargs):

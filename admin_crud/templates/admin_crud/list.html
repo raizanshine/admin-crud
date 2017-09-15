@@ -22,11 +22,46 @@
             </li>
         </ul>
         <div class="module" id="changelist">
-            <p class="paginator">
-                0 notes
-            </p>
+            <form id="changelist-form" method="post" novalidate=""><input type="hidden" name="csrfmiddlewaretoken" value="1ZVmfXhUSU4W5wJKPoTreodDs4SwGthWCf9Ozz7VunCRsXtCWn7sVpHUdwqjXedR">
+                <div class="actions">
+                    <label>Action: <select name="action" required="">
+                        <option value="" selected="">---------</option>
+                        <option value="delete_selected">Delete selected notes</option>
+                    </select></label><input type="hidden" name="select_across" value="0" class="select-across">
+                    <button type="submit" class="button" title="Run the selected action" name="index" value="0">Go</button>
+                    <span class="action-counter" data-actions-icnt="2" style="display: inline;">0 of 2 selected</span>
+                </div>
+                <div class="results">
+                    <table id="result_list">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="action-checkbox-column">
+                                <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
+                                <div class="clear"></div>
+                            </th>
+                            <th scope="col" class="column-__str__">
+                                <div class="text"><span>Note</span></div>
+                                <div class="clear"></div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for object in object_list %}
+                            <tr class="{% cycle 'row1' 'row2' %}">
+                                <td class="action-checkbox">
+                                    <input type="checkbox" name="_selected_action" value="{{ object.id }}" class="action-select"></td>
+                                <th class="field-__str__">
+                                    <a href="{{ object.get_admin_url }}">{{ object }}</a>
+                                </th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="paginator">2 notes</p>
+            </form>
         </div>
     </div>
-<br class="clear">
+    <br class="clear">
 
 {% endblock %}
