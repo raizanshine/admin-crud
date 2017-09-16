@@ -3,6 +3,7 @@ from django.forms.models import modelform_factory
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.urls import reverse_lazy
 
 
 class AdminController(object):
@@ -13,7 +14,6 @@ class AdminController(object):
     def get_actions(self):
         return {
             'list': self.list,
-            'detail': self.detail,
             'create': self.create,
             'update': self.update,
             'delete': self.delete,
@@ -22,7 +22,6 @@ class AdminController(object):
     def get_template_names(self, action):
         template_names = {
             'list': 'admin_crud/list.html',
-            'detail': 'admin_crud/detail.html',
             'create': 'admin_crud/create.html',
             'update': 'admin_crud/update.html',
             'delete': 'admin_crud/delete.html',
@@ -32,7 +31,15 @@ class AdminController(object):
 
     def get_context_data(self):
         breadcrumbs = [('Home', '/'), (self.model.__name__, None)]
-        return {'breadcrumbs': breadcrumbs}
+        model_name = self.model.__name__.lower()
+        links = {
+            'list': reverse_lazy('admin-crud:%s-list' % model_name),
+            'create': reverse_lazy('admin-crud:%s-create' % model_name)
+        }
+        return {
+            'breadcrumbs': breadcrumbs,
+            'links': links
+        }
 
     def get_object(self, pk):
         queryset = self.get_queryset()
@@ -60,9 +67,10 @@ class AdminController(object):
     
     def list(self, request, *args, **kwargs):
         template = self.get_template_names('list')
-        context = {
+        context = self.get_context_data()
+        context.update({
             'object_list': self.get_queryset()
-        }
+        })
         return TemplateResponse(request, template, context)
 
     def create(self, request, *args, **kwargs):
@@ -74,11 +82,6 @@ class AdminController(object):
                 obj = form.save()
                 return HttpResponseRedirect('/')
         context['form'] = form
-        return TemplateResponse(request, template, context)
-
-    def detail(self, request, *args, **kwargs):
-        template = self.get_template_names('detail')
-        context = self.get_context_data()
         return TemplateResponse(request, template, context)
 
     def update(self, request, *args, **kwargs):
@@ -100,7 +103,6 @@ class AdminController(object):
         return [
             url(r'^$', self.list, name='%s-list' % model_name),
             url(r'^create/$', self.create, name='%s-create' % model_name),
-            url(r'^(?P<pk>\d+)/$', self.detail, name='%s-detail' % model_name),
             url(r'^(?P<pk>\d+)/update/$', self.update, name='%s-update' % model_name),
             url(r'^(?P<pk>\d+)/delete/$', self.delete, name='%s-delete' % model_name),
         ]
