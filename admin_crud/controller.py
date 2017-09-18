@@ -29,6 +29,11 @@ class AdminController(object):
 
         return template_names[action]
 
+    def prepare_view(self, request, *args, **kwargs):
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+
     def get_context_data(self):
         breadcrumbs = [('Home', '/'), (self.model.__name__, None)]
         model_name = self.model.__name__.lower()
@@ -41,9 +46,9 @@ class AdminController(object):
             'links': links
         }
 
-    def get_object(self, pk):
+    def get_object(self):
         queryset = self.get_queryset()
-        obj = get_object_or_404(queryset, pk=pk)
+        obj = get_object_or_404(queryset, pk=self.kwargs['pk'])
         return obj
 
     def get_form(self, request):
@@ -54,6 +59,10 @@ class AdminController(object):
 
         kwargs = {}
 
+        if self.action == 'update':
+            kwargs.update({
+                'instance': self.get_object()
+            })
         if request.method == 'POST':
             kwargs.update({
                 'data': request.POST,
@@ -66,6 +75,7 @@ class AdminController(object):
         return self.model.objects.all()
     
     def list(self, request, *args, **kwargs):
+        self.prepare_view(request, *args, **kwargs)
         template = self.get_template_names('list')
         context = self.get_context_data()
         context.update({
@@ -74,6 +84,7 @@ class AdminController(object):
         return TemplateResponse(request, template, context)
 
     def create(self, request, *args, **kwargs):
+        self.prepare_view(request, *args, **kwargs)
         template = self.get_template_names('create')
         context = self.get_context_data()
         form = self.get_form(request)
@@ -85,11 +96,20 @@ class AdminController(object):
         return TemplateResponse(request, template, context)
 
     def update(self, request, *args, **kwargs):
+        self.prepare_view(request, *args, **kwargs)
+        self.action = 'update'
         template = self.get_template_names('update')
         context = self.get_context_data()
+        form = self.get_form(request)
+        if request.method == 'POST':
+            if form.is_valid():
+                obj = form.save()
+                return HttpResponseRedirect('/')
+        context['form'] = form
         return TemplateResponse(request, template, context)
 
     def delete(self, request, *args, **kwargs):
+        self.prepare_view(request, *args, **kwargs)
         template = self.get_template_names('delete')
         context = self.get_context_data()
         return TemplateResponse(request, template, context)
@@ -103,6 +123,6 @@ class AdminController(object):
         return [
             url(r'^$', self.list, name='%s-list' % model_name),
             url(r'^create/$', self.create, name='%s-create' % model_name),
-            url(r'^(?P<pk>\d+)/update/$', self.update, name='%s-update' % model_name),
+            url(r'^(?P<pk>\d+)/$', self.update, name='%s-update' % model_name),
             url(r'^(?P<pk>\d+)/delete/$', self.delete, name='%s-delete' % model_name),
         ]

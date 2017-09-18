@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create page</title>
-</head>
-<body>
+{% extends 'admin_crud/base.html' %}
 
-</body>
-</html>
+
+<body class=" app-blog model-note change-form" data-admin-utc-offset="0">
+
+
+<div class="breadcrumbs">
+    <a href="/admin/">Home</a>
+    &rsaquo; <a href="/admin/blog/">Blog</a>
+    &rsaquo; <a href="/admin/blog/note/">Notes</a>
+    &rsaquo; KekPek
+</div>
+
+{% block content %}
+    <h1>Change note</h1>
+    <div id="content-main">
+        <ul class="object-tools">
+            <li>
+                <a href="/admin/blog/note/1/history/" class="historylink">History</a>
+            </li>
+        </ul>
+        <form enctype="multipart/form-data" action="" method="post" id="note_form" novalidate>
+            {% csrf_token %}
+            <div>
+                <fieldset class="module aligned ">
+                    {% for field in form %}
+                        <ul class="errorlist">
+                            {{ field.errors }}
+                        </ul>
+                        <div class="form-row {% if field.errors %}errors {% endif %}field-{{ field.name }}">
+                            <div>
+                                <label class="required" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="help">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+                <div class="submit-row">
+                    <input type="submit" value="Save" class="default" name="_save" />
+                    <p class="deletelink-box"><a href="{{ delete_link }}" class="deletelink">Delete</a></p>
+                    <input type="submit" value="Save and add another" name="_addanother" />
+                    <input type="submit" value="Save and continue editing" name="_continue" />
+                </div>
+                <script type="text/javascript"
+                        id="django-admin-form-add-constants"
+                        src="/static/admin/js/change_form.js"
+                >
+                </script>
+                <script type="text/javascript"
+                        id="django-admin-prepopulated-fields-constants"
+                        src="/static/admin/js/prepopulate_init.js"
+                        data-prepopulated-fields="[]">
+                </script>
+            </div>
+        </form></div>
+    <br class="clear" />
+{% endblock %}
