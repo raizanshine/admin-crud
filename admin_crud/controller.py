@@ -6,10 +6,34 @@ from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 
 
+class ChangeList(object):
+    def __init__(self, controller, queryset):
+        super(ChangeList, self).__init__()
+        self.controller = controller
+        self.queryset = queryset
+        self.model = queryset.model
+        self.items = []
+        self.titles = []
+
+        fields = controller.fields
+        opts = self.model._meta
+        if controller.list_fields:
+            fields = controller.list_fields
+        if fields == '__all__':
+            fields = [field.name for field in opts.concrete_fields]
+
+        self.items = [[getattr(obj, field) for field in fields] for obj in queryset]
+
+        for field_name in fields:
+            field = opts.get_field(field_name)
+            self.titles.append(field.verbose_name)
+
+
 class AdminController(object):
     model = None
     form_class = None
     fields = '__all__'
+    list_fields = None
 
     def get_actions(self):
         return {
@@ -73,18 +97,25 @@ class AdminController(object):
 
     def get_queryset(self):
         return self.model.objects.all()
-    
+
+    def get_object_list(self):
+        cl = ChangeList(self, self.get_queryset())
+        return cl
+
     def list(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
+        self.action = 'list'
         template = self.get_template_names('list')
         context = self.get_context_data()
+        object_list = self.get_object_list()
         context.update({
-            'object_list': self.get_queryset()
+            'object_list': object_list
         })
         return TemplateResponse(request, template, context)
 
     def create(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
+        self.action = 'create'
         template = self.get_template_names('create')
         context = self.get_context_data()
         form = self.get_form(request)
@@ -110,6 +141,7 @@ class AdminController(object):
 
     def delete(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
+        self.action = 'delete'
         template = self.get_template_names('delete')
         context = self.get_context_data()
         return TemplateResponse(request, template, context)

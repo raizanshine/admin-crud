@@ -35,26 +35,24 @@
                     <table id="result_list">
                         <thead>
                         <tr>
-                            <th scope="col" class="action-checkbox-column">
-                                <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
-                                <div class="clear"></div>
-                            </th>
-                            <th scope="col" class="column-__str__">
-                                <div class="text"><span>Note</span></div>
-                                <div class="clear"></div>
-                            </th>
+                            {% for title in object_list.titles %}
+                                <th scope="col" class="column-__str__">
+                                    <div class="text"><span>{{ title }}</span></div>
+                                    <div class="clear"></div>
+                                </th>
+                            {% endfor %}
                         </tr>
                         </thead>
                         <tbody>
-                        {% for object in object_list %}
-                            <tr class="{% cycle 'row1' 'row2' %}">
-                                <td class="action-checkbox">
-                                    <input type="checkbox" name="_selected_action" value="{{ object.id }}" class="action-select"></td>
-                                <th class="field-__str__">
-                                    <a href="{{ object.get_admin_url }}">{{ object }}</a>
-                                </th>
-                            </tr>
-                        {% endfor %}
+                            {% for object in object_list.items %}
+                                <tr class="{% cycle 'row1' 'row2' %}">
+                                    {% for field in object %}
+                                        <th class="field-__str__">
+                                            {{ field }}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

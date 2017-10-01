@@ -12,9 +12,9 @@
                         </caption>
                         {% for admin in group.admins %}
                             <tr>
-                                <th scope="row"><a href="{{ admin.admin_list_url }}">{{ admin.verbose_name }}</a></th>
-                                <td><a href="#" class="addlink">Add</a></td>
-                                <td><a href="#" class="changelink">Change</a></td>
+                                <th scope="row"><a href="{{ admin.list_url }}">{{ admin.verbose_name }}</a></th>
+                                <td><a href="{{ admin.create_url }}" class="addlink">Add</a></td>
+                                <td><a href="{{ admin.list_url }}" class="changelink">Change</a></td>
                             </tr>
                         {% endfor %}
                     </table>

@@ -25,7 +25,8 @@ class Router(object):
                 }
             controller_info = {
                 'verbose_name': capfirst(controller.model._meta.verbose_name_plural),
-                'admin_list_url': reverse('admin-crud:%s-list' % controller.model.__name__.lower()),
+                'list_url': reverse('admin-crud:%s-list' % controller.model.__name__.lower()),
+                'create_url': reverse('admin-crud:%s-create' % controller.model.__name__.lower()),
             }
             groups[app_label]['admins'].append(controller_info)
 
