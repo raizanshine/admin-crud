@@ -3,10 +3,14 @@ from django.forms.models import modelform_factory
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 
 class ChangeList(object):
+    """
+    A list of model objects modified for comfy rendering. The class gets controller and queryset and
+    then provide only attributes which can be used on object list page.
+    """
     def __init__(self, controller, queryset):
         super(ChangeList, self).__init__()
         self.controller = controller
@@ -14,6 +18,7 @@ class ChangeList(object):
         self.model = queryset.model
         self.items = []
         self.titles = []
+        self.clickables = ['id']
 
         fields = controller.fields
         opts = self.model._meta
@@ -22,11 +27,25 @@ class ChangeList(object):
         if fields == '__all__':
             fields = [field.name for field in opts.concrete_fields]
 
-        self.items = [[getattr(obj, field) for field in fields] for obj in queryset]
+        items = []
+
+        for obj in queryset:
+            values = []
+            for field in fields:
+                values.append({
+                    'value': getattr(obj, field),
+                    'link': self.get_change_url(obj) if field in self.clickables else False
+                })
+            items.append(values)
+        self.items = items
 
         for field_name in fields:
             field = opts.get_field(field_name)
             self.titles.append(field.verbose_name)
+
+    def get_change_url(self, obj):
+        model_name = self.model.__name__.lower()
+        return reverse('admin-crud:%s-update' % model_name, args=[obj.pk])
 
 
 class AdminController(object):
@@ -122,7 +141,9 @@ class AdminController(object):
         if request.method == 'POST':
             if form.is_valid():
                 obj = form.save()
-                return HttpResponseRedirect('/')
+                model_name = self.model.__name__.lower()
+                success_url = reverse('admin-crud:%s-list' % model_name)
+                return HttpResponseRedirect(success_url)
         context['form'] = form
         return TemplateResponse(request, template, context)
 
@@ -135,7 +156,9 @@ class AdminController(object):
         if request.method == 'POST':
             if form.is_valid():
                 obj = form.save()
-                return HttpResponseRedirect('/')
+                model_name = self.model.__name__.lower()
+                success_url = reverse('admin-crud:%s-list' % model_name)
+                return HttpResponseRedirect(success_url)
         context['form'] = form
         return TemplateResponse(request, template, context)
 

@@ -23,14 +23,6 @@
         </ul>
         <div class="module" id="changelist">
             <form id="changelist-form" method="post" novalidate=""><input type="hidden" name="csrfmiddlewaretoken" value="1ZVmfXhUSU4W5wJKPoTreodDs4SwGthWCf9Ozz7VunCRsXtCWn7sVpHUdwqjXedR">
-                <div class="actions">
-                    <label>Action: <select name="action" required="">
-                        <option value="" selected="">---------</option>
-                        <option value="delete_selected">Delete selected notes</option>
-                    </select></label><input type="hidden" name="select_across" value="0" class="select-across">
-                    <button type="submit" class="button" title="Run the selected action" name="index" value="0">Go</button>
-                    <span class="action-counter" data-actions-icnt="2" style="display: inline;">0 of 2 selected</span>
-                </div>
                 <div class="results">
                     <table id="result_list">
                         <thead>
@@ -44,11 +36,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                            {% for object in object_list.items %}
+                            {% for item in object_list.items %}
                                 <tr class="{% cycle 'row1' 'row2' %}">
-                                    {% for field in object %}
-                                        <th class="field-__str__">
-                                            {{ field }}
+                                    {% for field in item %}
+                                        <th class="field-{{ field.name }}">
+                                            {% if field.link %}
+                                                <a href="{{ field.link }}">{{ field.value }}</a>
+                                            {% else %}
+                                                {{ field.value }}
+                                            {% endif %}
                                         </th>
                                     {% endfor %}
                                 </tr>
