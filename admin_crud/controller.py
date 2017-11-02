@@ -1,3 +1,4 @@
+from admin_crud.decorators import action
 from django.conf.urls import url
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseRedirect
@@ -54,13 +55,17 @@ class AdminController(object):
     fields = '__all__'
     list_fields = None
 
+    def __init__(self, *args, **kwargs):
+        self._actions = self.get_actions()
+
     def get_actions(self):
-        return {
-            'list': self.list,
-            'create': self.create,
-            'update': self.update,
-            'delete': self.delete,
-        }
+        actions = []
+        for method_name in dir(self):
+            method = getattr(self, method_name)
+            if callable(method) and hasattr(method, 'action'):
+                actions.append(method)
+
+        return actions
 
     def get_template_names(self, action):
         template_names = {
@@ -121,9 +126,9 @@ class AdminController(object):
         cl = ChangeList(self, self.get_queryset())
         return cl
 
+    @action(url=[r'^$', '{model_name}-list'])
     def list(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
-        self.action = 'list'
         template = self.get_template_names('list')
         context = self.get_context_data()
         object_list = self.get_object_list()
@@ -132,9 +137,9 @@ class AdminController(object):
         })
         return TemplateResponse(request, template, context)
 
+    @action(url=[r'^create/$', '{model_name}-create'])
     def create(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
-        self.action = 'create'
         template = self.get_template_names('create')
         context = self.get_context_data()
         form = self.get_form(request)
@@ -147,6 +152,7 @@ class AdminController(object):
         context['form'] = form
         return TemplateResponse(request, template, context)
 
+    @action(url=[r'^(?P<pk>\d+)/$', '{model_name}-update'])
     def update(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
         self.action = 'update'
@@ -162,6 +168,7 @@ class AdminController(object):
         context['form'] = form
         return TemplateResponse(request, template, context)
 
+    @action(url=[r'^(?P<pk>\d+)/delete/$', '{model_name}-delete'])
     def delete(self, request, *args, **kwargs):
         self.prepare_view(request, *args, **kwargs)
         self.action = 'delete'
@@ -174,10 +181,8 @@ class AdminController(object):
         Generate urls for any available actions
         """
         model_name = self.model.__name__.lower()
+        urls = []
 
-        return [
-            url(r'^$', self.list, name='%s-list' % model_name),
-            url(r'^create/$', self.create, name='%s-create' % model_name),
-            url(r'^(?P<pk>\d+)/$', self.update, name='%s-update' % model_name),
-            url(r'^(?P<pk>\d+)/delete/$', self.delete, name='%s-delete' % model_name),
-        ]
+        for action in self._actions:
+            urls.append(url(action.url[0], action, name=action.url[1].format(model_name=model_name)))
+        return urls
